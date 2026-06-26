@@ -9,7 +9,8 @@ args = Namespace(
     small=False,
     dropout=0,
     alternate_corr=False,
-    mixed_precision=False
+    mixed_precision=False,
+    use_haze_token=True
 )
 
 model = RAFT(args).to(device)

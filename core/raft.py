@@ -121,7 +121,9 @@ class RAFT(nn.Module):
         # Generate Global Haze Token
         # ----------------------------------
         
-        haze_token = self.haze_conditioner(image1)
+        if getattr(self.args, "use_haze_token", False):
+            # Generate Global Haze Token
+            haze_token = self.haze_conditioner(image1)
         
         # run the context network
         with autocast(enabled=self.args.mixed_precision):
@@ -132,7 +134,8 @@ class RAFT(nn.Module):
             # ----------------------------------
             # FiLM Conditioning on Context Features
             # ----------------------------------
-            inp = self.context_film(inp, haze_token)
+            if getattr(self.args, "use_haze_token", False):
+                inp = self.context_film(inp, haze_token)
         coords0, coords1 = self.initialize_flow(image1)
 
         if flow_init is not None:
