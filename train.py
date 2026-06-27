@@ -216,6 +216,7 @@ def train(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--haze_level',type=str,default='light',choices=['light', 'medium', 'dense', 'extreme'],help='Synthetic haze level')
     parser.add_argument('--use_haze_token', action='store_true', help='Enable Global Haze Token FiLM conditioning')
     parser.add_argument('--name', default='raft', help="name your experiment")
     parser.add_argument('--stage', help="determines which dataset to use for training") 

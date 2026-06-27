@@ -176,6 +176,42 @@ class KITTI(FlowDataset):
         if split == 'training':
             self.flow_list = sorted(glob(osp.join(root, 'flow_occ/*_10.png')))
 
+class KITTIHazy(FlowDataset):
+    def __init__(self,
+                 aug_params=None,
+                 haze_level='light',
+                 split='training',
+                 root='datasets'):
+
+        super(KITTIHazy, self).__init__(aug_params, sparse=True)
+
+        if split == 'testing':
+            self.is_test = True
+
+        kitti_root = osp.join(root, 'KITTI', split)
+
+        hazy_map = {
+            'light': 'KITTI_LIGHT',
+            'medium': 'KITTI_MEDIUM',
+            'dense': 'KITTI_DENSE',
+            'extreme': 'KITTI_EXTREME'
+        }
+
+        hazy_root = osp.join(root, hazy_map[haze_level])
+
+        images1 = sorted(glob(osp.join(hazy_root, '*_10.png')))
+        images2 = sorted(glob(osp.join(hazy_root, '*_11.png')))
+
+        for img1, img2 in zip(images1, images2):
+            frame_id = osp.basename(img1)
+
+            self.extra_info += [[frame_id]]
+            self.image_list += [[img1, img2]]
+
+        if split == 'training':
+            self.flow_list = sorted(
+                glob(osp.join(kitti_root, 'flow_occ', '*_10.png'))
+            )
 
 class HD1K(FlowDataset):
     def __init__(self, aug_params=None, root='datasets/HD1k'):
@@ -226,9 +262,24 @@ def fetch_dataloader(args, TRAIN_DS='C+T+K+S+H'):
     elif args.stage == 'kitti':
         aug_params = {'crop_size': args.image_size, 'min_scale': -0.2, 'max_scale': 0.4, 'do_flip': False}
         train_dataset = KITTI(aug_params, split='training')
+    
+    elif args.stage == 'kitti_hazy':
+        aug_params = {
+            'crop_size': args.image_size,
+            'min_scale': -0.2,
+            'max_scale': 0.4,
+            'do_flip': False
+        }   
+        train_dataset = KITTIHazy(
+            aug_params,
+            split='training',
+            haze_level=args.haze_level
+        )
 
     train_loader = data.DataLoader(train_dataset, batch_size=args.batch_size, 
         pin_memory=False, shuffle=True, num_workers=4, drop_last=True)
+    
+    
 
     print('Training with %d image pairs' % len(train_dataset))
     return train_loader
