@@ -88,7 +88,19 @@ class FlowAugmentor:
             flow = cv2.resize(flow, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_LINEAR)
             flow = flow * [scale_x, scale_y]
 
+
+        # Fix undersized KITTI samples
+        if img1.shape[0] < self.crop_size[0] or img1.shape[1] < self.crop_size[1]:
+            scale_y = self.crop_size[0] / float(img1.shape[0])
+            scale_x = self.crop_size[1] / float(img1.shape[1])
+            scale = max(scale_x, scale_y)
+
+            img1 = cv2.resize(img1, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
+            img2 = cv2.resize(img2, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
+            flow, valid = self.resize_sparse_flow_map(flow, valid, fx=scale, fy=scale)
+
         if self.do_flip:
+
             if np.random.rand() < self.h_flip_prob: # h-flip
                 img1 = img1[:, ::-1]
                 img2 = img2[:, ::-1]
@@ -210,7 +222,19 @@ class SparseFlowAugmentor:
             img2 = cv2.resize(img2, None, fx=scale_x, fy=scale_y, interpolation=cv2.INTER_LINEAR)
             flow, valid = self.resize_sparse_flow_map(flow, valid, fx=scale_x, fy=scale_y)
 
+
+        # Fix undersized KITTI samples
+        if img1.shape[0] < self.crop_size[0] or img1.shape[1] < self.crop_size[1]:
+            scale_y = self.crop_size[0] / float(img1.shape[0])
+            scale_x = self.crop_size[1] / float(img1.shape[1])
+            scale = max(scale_x, scale_y)
+
+            img1 = cv2.resize(img1, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
+            img2 = cv2.resize(img2, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
+            flow, valid = self.resize_sparse_flow_map(flow, valid, fx=scale, fy=scale)
+
         if self.do_flip:
+
             if np.random.rand() < 0.5: # h-flip
                 img1 = img1[:, ::-1]
                 img2 = img2[:, ::-1]

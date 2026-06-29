@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from .vlm_tokens.clip_features import CLIPFeatureExtractor
-from .vlm_tokens.global_token import GlobalHazeToken
+from vlm_tokens.clip_features import CLIPFeatureExtractor
+from vlm_tokens.global_token import GlobalHazeToken
 
 class HazeConditioner(nn.Module):
     """

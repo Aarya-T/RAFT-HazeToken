@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import sys
-sys.path.append('core')
+sys.path.insert(0, 'core')
 
 import argparse
 import os
@@ -187,7 +187,7 @@ def train(args):
                 torch.save(model.state_dict(), PATH)
 
                 results = {}
-                for val_dataset in args.validation:
+                for val_dataset in (args.validation or []):
                     if val_dataset == 'chairs':
                         results.update(evaluate.validate_chairs(model.module))
                     elif val_dataset == 'sintel':
